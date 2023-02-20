@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>istio-demo</artifactId>
+        <groupId>istio.demo</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>istio.demo.app2</groupId>
+    <artifactId>app2</artifactId>
+    <version>1.1</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>istio.demo</groupId>
+            <artifactId>istio.demo.service</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-kubernetes</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>app2</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <!--配置基本镜像，这里可以修改为自己的镜像，或精简或修改，但是一定要在私有库中有-->
+                    <from>
+                        <image>java:openjdk-8-jre-alpine</image>
+                    </from>
+                    <!--配置最终推送的地址，仓库名，镜像名-->
+                    <to>
+                        <tags>
+                            <!--tag即镜像的版本，一般是覆盖latest并且新增一个当前版本号-->
+                        </tags>
+                        <!--配置私有仓库地址-->
+                        <image>${project.build.finalName}:${project.version}</image>
+                    </to>
+                    <allowInsecureRegistries>true</allowInsecureRegistries>
+                    <container>
+                        <!--jvm内存参数,jvm启动时的所有参数都可以在这里增加-->
+                        <jvmFlags>
+                            <jvmFlag>-Xms512m</jvmFlag>
+                            <jvmFlag>-Xmx512m</jvmFlag>
+                            <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
+                            <jvmFlag>-Dfile.encoding=UTF8</jvmFlag>
+                        </jvmFlags>
+                        <mainClass>istio.demo.app2.IstioDemoApplication</mainClass>
+                        <!--要暴露的端口-->
+                        <ports>
+                            <port>8002</port>
+                        </ports>
+                        <!--修改镜像默认时间，否则会导致镜像内时区问题-->
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                    <outputPaths>
+                        <tar>target/${project.build.finalName}-${project.version}.tar</tar>
+                    </outputPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
